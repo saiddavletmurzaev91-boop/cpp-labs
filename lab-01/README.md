@@ -31,6 +31,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -45,11 +46,11 @@ private:
 public:
     Booking(const std::string& guestName, int nights)
         : guestName_(guestName), nights_(nights) {
-        ++bookingCount_;  // Увеличиваем число активных бронирований.
+        ++bookingCount_;
     }
 
     ~Booking() {
-        --bookingCount_;  // Уменьшаем счётчик при уничтожении объекта.
+        --bookingCount_;
     }
 
     Booking(const Booking&) = delete;
@@ -97,14 +98,17 @@ public:
             std::cout << "Ошибка: имя гостя не может быть пустым.\n";
             return;
         }
+
         if (nights <= 0) {
-            std::cout << "Ошибка: количество ночей должно быть больше нуля.\n";
+            std::cout
+                << "Ошибка: количество ночей должно быть больше нуля.\n";
             return;
         }
 
         bookings_.push_back(
             std::make_unique<Booking>(guestName, nights)
         );
+
         std::cout << "Бронирование добавлено в номер "
                   << number_ << ".\n";
     }
@@ -143,20 +147,44 @@ public:
 
     void addRoom(Room* room) {
         if (room == nullptr) {
-            std::cout << "Ошибка: нельзя добавить нулевой указатель.\n";
+            std::cout
+                << "Ошибка: нельзя добавить нулевой указатель.\n";
             return;
         }
 
         for (const Room* existing : rooms_) {
             if (existing == room) {
-                std::cout << "Этот номер уже добавлен в гостиницу.\n";
+                std::cout
+                    << "Этот номер уже добавлен в гостиницу.\n";
                 return;
             }
         }
 
         rooms_.push_back(room);
+
         std::cout << "Номер " << room->getNumber()
                   << " добавлен в гостиницу.\n";
+    }
+
+    void removeRoom(Room* room) {
+        if (room == nullptr) {
+            std::cout
+                << "Ошибка: нельзя удалить нулевой указатель.\n";
+            return;
+        }
+
+        for (auto it = rooms_.begin(); it != rooms_.end(); ++it) {
+            if (*it == room) {
+                int number = room->getNumber();
+                rooms_.erase(it);
+
+                std::cout << "Номер " << number
+                          << " удалён из гостиницы.\n";
+                return;
+            }
+        }
+
+        std::cout << "Номер не найден в гостинице.\n";
     }
 
     void print() const {
@@ -192,13 +220,13 @@ int main() {
 
     hotel1.addRoom(&room101);
     hotel1.addRoom(&room202);
-    hotel1.addRoom(nullptr);  // Проверка нулевого указателя.
+    hotel1.addRoom(nullptr);
 
     room101.addBooking("Иван Петров", 3);
     room101.addBooking("Мария Иванова", 2);
     room202.addBooking("Алексей Смирнов", 1);
-    room202.addBooking("", 2);  // Проверка пустого имени.
-    room202.addBooking("Ольга Соколова", 0);  // Проверка числа ночей.
+    room202.addBooking("", 2);
+    room202.addBooking("Ольга Соколова", 0);
 
     hotel1.print();
 
@@ -208,6 +236,7 @@ int main() {
     {
         Room temporaryRoom(303, 1);
         temporaryRoom.addBooking("Временный гость", 1);
+
         std::cout << "Перед уничтожением временного номера: "
                   << Booking::getBookingCount() << '\n';
     }
@@ -215,7 +244,23 @@ int main() {
     std::cout << "После уничтожения временного номера: "
               << Booking::getBookingCount() << '\n';
 
-    std::cout << "\nHotel хранит невладеющие указатели на номера Room.\n";
+    std::cout << "\nПроверка агрегации:\n";
+
+    Room independentRoom(404, 2);
+    independentRoom.addBooking("Независимый гость", 2);
+
+    hotel1.addRoom(&independentRoom);
+    hotel1.print();
+
+    hotel1.removeRoom(&independentRoom);
+
+    std::cout << "Проверяем, существует ли номер 404 после удаления "
+                 "из гостиницы:\n";
+    independentRoom.print();
+
+    std::cout << "Количество активных бронирований: "
+              << Booking::getBookingCount() << '\n';
+
     return 0;
 }
 ```
