@@ -1,1 +1,14 @@
-lab-05/lab5.exe
+# Compiled executables
+*.exe
+
+# Object files
+*.o
+*.obj
+
+# Temporary and log files
+*.tmp
+*.log
+compile-log.txt
+
+# Generated data
+vector_data.txt
