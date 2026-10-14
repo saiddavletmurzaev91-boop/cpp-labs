@@ -11,5 +11,7 @@
 compile-log.txt
 
 # Generated data
-vector_data.txtlab-07/numbers.txt
+vector_data.txt
+lab-03/vector_data.txt
+lab-07/numbers.txt
 lab-07/sorted.txt
